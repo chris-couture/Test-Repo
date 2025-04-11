@@ -1,21 +1,19 @@
-# Regular Expression: Name
+# Name
 
 ## Description  
 Description of the classifier
 
----
 
-## 📚 Regex Value
-Example regex
 
----
+## 📚 Regular Expression
+Regex value
+
 
 ## 🔄 Change Log
 
 | Date       | Change Description                        | Updated By    |
 |------------|--------------------------------------------|---------------|
-| YYYY-MM-DD | Regex Created | user|
+| DD-MM-YYYY | Dictionary Created | @user|
 
----
 
-## 🔧 Linked Issue: ()
+## 🔧 Linked Issue: (URL)
