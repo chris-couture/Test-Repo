@@ -1,26 +1,25 @@
-# Dictionary: Name
+# Name
 
 ## Description  
 Description of the classifier
 
----
 
-## 📚 Dictionary Terms and Weights
+
+## 📚 Dictionary Terms & Weights
 
 | Term              | Weight |
 |-------------------|--------|
 | `term1`  | 1 |
 | `term2`  | 2 |
+| `term3` | 3 |
 
 
----
 
 ## 🔄 Change Log
 
 | Date       | Change Description                        | Updated By    |
 |------------|--------------------------------------------|---------------|
-| YYYY-MM-DD | Dictionary Created | user|
+| DD-MM-YYYY | Dictionary Created | @user|
 
----
 
-## 🔧 Linked Issue: ()
+## 🔧 Linked Issue: (URL)
