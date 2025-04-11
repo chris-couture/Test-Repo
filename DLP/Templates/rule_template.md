@@ -7,19 +7,25 @@ Description of rule
 
 ## 🔧 Condition
 
-| Classifier Name                          | Type        | Reference Path                                                  |
-|------------------------------------------|-------------|-----------------------------------------------------------------|
-| `ExampleDictionary`                      | Dictionary  | [View Classifier](../classifiers/custom/Dictionaries/ExampleDictionary.md) |
-| `SensitiveRegex`                         | Regex       | [View Classifier](../classifiers/custom/Regex/SensitiveRegex.md)         |
+| Classifier Name                          | Type        | Reference Path                                                  | Minimum Threshold |
+|------------------------------------------|-------------|-----------------------------------------------------------------|--------|
+| `ExampleDictionary`                      | Dictionary  | [View Classifier](../classifiers/custom/Dictionaries/ExampleDictionary.md) | 1
+| `SensitiveRegex`                         | Regex       | [View Classifier](../classifiers/custom/Regex/SensitiveRegex.md)         | 1
 
 **Minimum Total Weight to Trigger:** 75
 
 ---
 
-## 🚦 Severity and Action
+## 🚦 Severity & Action
 
-- **Severity:** Low/Medium/High
-- **Action on Trigger:** Allow/Block
+**Severity:** Low/Medium/High
+- [ ] Low
+- [ ] Medium
+- [ ] High
+
+**Action:** Allow/Block
+- [ ] Allow
+- [ ] Block
 
 ---
 
