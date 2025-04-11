@@ -19,3 +19,6 @@
 
 **Enforcement Mode:** 
 - Block
+
+**Related Issue:** 
+- [#42](https://github.com/chris-couture/Test-Repo/issues/1)
