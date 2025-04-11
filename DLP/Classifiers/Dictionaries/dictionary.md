@@ -1,7 +1,5 @@
 # Dictionary Classifier: Test Dictionary 1
 
-tesatajkfjklsdAF JKLHASDFJLKADLKJFLAKDF
-
 ## Description  
 Test dictionary for learning Github workflow/process
 
