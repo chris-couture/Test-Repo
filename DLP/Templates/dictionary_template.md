@@ -12,7 +12,6 @@ Description of the classifier
 | `term1`  | 1 |
 | `term2`  | 2 |
 
-> ℹ️ **Note:** Higher weights indicate more sensitive or relevant terms. These contribute more heavily to the overall detection score.
 
 ---
 
