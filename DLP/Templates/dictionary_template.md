@@ -1,6 +1,6 @@
 # Name
 
-## Description  
+## 📄 Description  
 Description of the classifier
 
 
