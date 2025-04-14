@@ -16,7 +16,7 @@ Description of the classifier
 
 | Date       | Change Description                        | Updated By    |
 |------------|--------------------------------------------|---------------|
-| DD-MM-YYYY | Dictionary Created | @user|
+| DD-MM-YYYY | Classifier Created | @user|
 
 
 ## 🔧 Linked Issue: (URL)
