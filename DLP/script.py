@@ -12,7 +12,7 @@ md_template = """# Title: {filename}
 
 ## Description
 
-(Add your description here.)
+{description}
 
 ## Details
 
@@ -31,10 +31,11 @@ os.makedirs(output_folder, exist_ok=True)
 with open(csv_file, newline='', encoding='utf-8') as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
-        if not row or len(row) < 2:
+        if not row or len(row) < 3:
             continue  # Skip empty rows or rows without enough columns
         filename = row[0].strip()
-        value = row[1].strip()
+        description = row[1].strip()
+        value = row[2].strip()
 
         if filename:
             # Sanitize filename and make sure it ends with .md
@@ -44,9 +45,9 @@ with open(csv_file, newline='', encoding='utf-8') as csvfile:
 
             filepath = os.path.join(output_folder, safe_filename)
 
-            # Populate the markdown template with the filename and regex value
+            # Populate the markdown template with the filename, description, and regex value
             file_title = os.path.splitext(safe_filename)[0]
-            content = md_template.format(filename=file_title, regex_value=value)
+            content = md_template.format(filename=file_title, description=description, regex_value=value)
 
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(content)
