@@ -4,9 +4,16 @@ Sub ConvertToMarkdownTermAndWeight()
     Dim output As String
     Dim i As Integer
     Dim line As String
-    Dim lastSpacePos As Long
+    Dim matches As Object
+    Dim regex As Object
     Dim term As String
     Dim weight As String
+
+    ' Create the RegExp object
+    Set regex = CreateObject("VBScript.RegExp")
+    regex.Pattern = "^(.*\S)\s+(\d+)$"
+    regex.IgnoreCase = True
+    regex.Global = False
 
     For Each cell In Selection
         If cell.Value <> "" Then
@@ -14,17 +21,14 @@ Sub ConvertToMarkdownTermAndWeight()
             output = "| Term | Weight |" & vbCrLf & "|------|--------|" & vbCrLf
             For i = LBound(lines) To UBound(lines)
                 line = Trim(lines(i))
-                If line <> "" Then
-                    ' Find the last space to separate term and weight
-                    lastSpacePos = InStrRev(line, " ")
-                    If lastSpacePos > 0 Then
-                        term = Trim(Left(line, lastSpacePos - 1))
-                        weight = Trim(Mid(line, lastSpacePos + 1))
-                        output = output & "| " & term & " | " & weight & " |" & vbCrLf
-                    End If
+                If regex.Test(line) Then
+                    Set matches = regex.Execute(line)
+                    term = matches(0).SubMatches(0)
+                    weight = matches(0).SubMatches(1)
+                    output = output & "| " & term & " | " & weight & " |" & vbCrLf
                 End If
             Next i
-            cell.Offset(0, 1).Value = output ' Output to column to the right
+            cell.Offset(0, 1).Value = output ' Output to adjacent column
         End If
     Next cell
 End Sub
