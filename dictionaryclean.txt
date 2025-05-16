@@ -15,12 +15,17 @@ Sub ConvertToMarkdownWithWeights()
                 parts = Split(Trim(lines(i)))
                 If UBound(parts) >= 0 Then
                     weight = parts(UBound(parts))
-                    term = Join(Application.Index(parts, 0, 0), " ", , UBound(parts))
-                    term = Trim(Replace(lines(i), weight, ""))
+                    ' Reconstruct term from all parts except the last one
+                    term = ""
+                    Dim j As Integer
+                    For j = 0 To UBound(parts) - 1
+                        term = term & parts(j) & " "
+                    Next j
+                    term = Trim(term)
                     output = output & "| " & term & " | " & weight & " |" & vbCrLf
                 End If
             Next i
-            cell.Offset(0, 1).Value = output ' Output to the adjacent column
+            cell.Offset(0, 1).Value = output ' Output to adjacent column
         End If
     Next cell
 End Sub
