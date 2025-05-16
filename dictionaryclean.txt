@@ -6,6 +6,7 @@ Sub ConvertToMarkdownWithWeights()
     Dim parts() As String
     Dim term As String
     Dim weight As String
+    Dim j As Integer
     
     For Each cell In Selection
         If cell.Value <> "" Then
@@ -14,14 +15,15 @@ Sub ConvertToMarkdownWithWeights()
             For i = LBound(lines) To UBound(lines)
                 parts = Split(Trim(lines(i)))
                 If UBound(parts) >= 0 Then
-                    weight = parts(UBound(parts))
-                    ' Reconstruct term from all parts except the last one
+                    weight = parts(UBound(parts)) ' Last element
                     term = ""
-                    Dim j As Integer
                     For j = 0 To UBound(parts) - 1
-                        term = term & parts(j) & " "
+                        term = term & parts(j)
+                        If j < UBound(parts) - 1 Then
+                            term = term & " "
+                        End If
                     Next j
-                    term = Trim(term)
+                    If term = "" Then term = parts(0) ' In case it's a single word
                     output = output & "| " & term & " | " & weight & " |" & vbCrLf
                 End If
             Next i
