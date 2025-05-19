@@ -1,13 +1,13 @@
 import os
 
-# Input and output folder paths (edit these)
+# Input and output folders
 input_folder = r"C:\Users\YourName\Documents\markdown_files"
 output_folder = r"C:\Users\YourName\Documents\markdown_cleaned"
 
-# Create the output folder if it doesn't exist
+# Ensure output folder exists
 os.makedirs(output_folder, exist_ok=True)
 
-# Process each .md file
+# Loop through all .md files
 for filename in os.listdir(input_folder):
     if filename.endswith(".md"):
         input_path = os.path.join(input_folder, filename)
@@ -17,26 +17,28 @@ for filename in os.listdir(input_folder):
             lines = f.readlines()
 
         new_lines = []
-        inside_target_section = False
-        skipping_blank_lines = False
+        in_target_section = False
+        skipping_blanks = False
 
-        for line in lines:
-            if line.strip() == "## Dictionary Terms and Weights":
-                inside_target_section = True
-                skipping_blank_lines = True
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+
+            if stripped == "## Dictionary Terms and Weights":
+                in_target_section = True
+                skipping_blanks = True
                 new_lines.append(line)
                 continue
 
-            if inside_target_section:
-                if skipping_blank_lines and line.strip() == "":
-                    continue  # Skip blank line
+            if in_target_section:
+                if stripped == "":
+                    continue  # Skip all blank lines
                 else:
-                    skipping_blank_lines = False
+                    skipping_blanks = False
+                    in_target_section = False  # Stop skipping once we hit non-blank content
 
             new_lines.append(line)
 
-        # Write cleaned content to new file in output folder
         with open(output_path, "w", encoding="utf-8") as f:
             f.writelines(new_lines)
 
-print("All files cleaned and saved to:", output_folder)
+print("Finished cleaning files. Output saved to:", output_folder)
