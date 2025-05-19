@@ -1,13 +1,19 @@
 import os
 
-# Use raw string or forward slashes to avoid unicode escape issues
-folder_path = r"C:\Users\YourName\Documents\markdown_files"
+# Input and output folder paths (edit these)
+input_folder = r"C:\Users\YourName\Documents\markdown_files"
+output_folder = r"C:\Users\YourName\Documents\markdown_cleaned"
 
-for filename in os.listdir(folder_path):
+# Create the output folder if it doesn't exist
+os.makedirs(output_folder, exist_ok=True)
+
+# Process each .md file
+for filename in os.listdir(input_folder):
     if filename.endswith(".md"):
-        file_path = os.path.join(folder_path, filename)
+        input_path = os.path.join(input_folder, filename)
+        output_path = os.path.join(output_folder, filename)
 
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(input_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         new_lines = []
@@ -23,13 +29,14 @@ for filename in os.listdir(folder_path):
 
             if inside_target_section:
                 if skipping_blank_lines and line.strip() == "":
-                    continue
+                    continue  # Skip blank line
                 else:
                     skipping_blank_lines = False
 
             new_lines.append(line)
 
-        with open(file_path, "w", encoding="utf-8") as f:
+        # Write cleaned content to new file in output folder
+        with open(output_path, "w", encoding="utf-8") as f:
             f.writelines(new_lines)
 
-print("Done cleaning .md files.")
+print("All files cleaned and saved to:", output_folder)
