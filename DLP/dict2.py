@@ -1,9 +1,8 @@
 import os
 
-# Folder containing the .md files
-folder_path = "path/to/your/md/files"  # ← Replace with your actual path
+# Use raw string or forward slashes to avoid unicode escape issues
+folder_path = r"C:\Users\YourName\Documents\markdown_files"
 
-# Go through all .md files in the folder
 for filename in os.listdir(folder_path):
     if filename.endswith(".md"):
         file_path = os.path.join(folder_path, filename)
@@ -15,7 +14,7 @@ for filename in os.listdir(folder_path):
         inside_target_section = False
         skipping_blank_lines = False
 
-        for i, line in enumerate(lines):
+        for line in lines:
             if line.strip() == "## Dictionary Terms and Weights":
                 inside_target_section = True
                 skipping_blank_lines = True
@@ -24,9 +23,9 @@ for filename in os.listdir(folder_path):
 
             if inside_target_section:
                 if skipping_blank_lines and line.strip() == "":
-                    continue  # skip blank line
+                    continue
                 else:
-                    skipping_blank_lines = False  # first non-blank line after header
+                    skipping_blank_lines = False
 
             new_lines.append(line)
 
