@@ -4,10 +4,10 @@ import os
 input_folder = r"C:\Users\YourName\Documents\markdown_files"
 output_folder = r"C:\Users\YourName\Documents\markdown_cleaned"
 
-# Ensure output folder exists
+# Create output folder if it doesn't exist
 os.makedirs(output_folder, exist_ok=True)
 
-# Loop through all .md files
+# Process each .md file
 for filename in os.listdir(input_folder):
     if filename.endswith(".md"):
         input_path = os.path.join(input_folder, filename)
@@ -17,28 +17,22 @@ for filename in os.listdir(input_folder):
             lines = f.readlines()
 
         new_lines = []
-        in_target_section = False
-        skipping_blanks = False
+        in_cleanup_zone = False
 
-        for i, line in enumerate(lines):
-            stripped = line.strip()
-
-            if stripped == "## Dictionary Terms and Weights":
-                in_target_section = True
-                skipping_blanks = True
+        for line in lines:
+            if line.strip() == "## Dictionary Terms and Weights":
+                in_cleanup_zone = True
                 new_lines.append(line)
                 continue
 
-            if in_target_section:
-                if stripped == "":
-                    continue  # Skip all blank lines
-                else:
-                    skipping_blanks = False
-                    in_target_section = False  # Stop skipping once we hit non-blank content
+            if in_cleanup_zone:
+                # Skip blank lines entirely
+                if line.strip() == "":
+                    continue
 
             new_lines.append(line)
 
         with open(output_path, "w", encoding="utf-8") as f:
             f.writelines(new_lines)
 
-print("Finished cleaning files. Output saved to:", output_folder)
+print("All blank lines removed below '## Dictionary Terms and Weights'. Cleaned files saved to:", output_folder)
