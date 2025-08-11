@@ -1,12 +1,16 @@
 # pip install openpyxl
 import re
 from openpyxl import load_workbook
+from pathlib import Path
 
 EXCEL_PATH = "test.xlsx"
-SHEET_NAME = "sheet1"
+SHEET_NAME = "Sheet1"
+OUTPUT_MD = "dlp_output.md"
 
 ID_HEADER = "Condition Number"
 NAME_HEADER = "Content Classifier Name"
+TYPE_HEADER = "Type"
+THRESH_HEADER = "Threshold"
 
 def normalize_id(x):
     """Make numeric-like IDs into plain int strings (e.g., '1.0' -> '1')."""
@@ -18,6 +22,10 @@ def normalize_id(x):
     except:
         return s
 
+def escape_md_cell(text):
+    """Escape | characters so they don't break the markdown table."""
+    return str(text).replace("|", r"\|")
+
 # 1) Open workbook & sheet
 wb = load_workbook(EXCEL_PATH)
 ws = wb[SHEET_NAME]
@@ -25,45 +33,65 @@ ws = wb[SHEET_NAME]
 # 2) Read original boolean logic from A1
 original_logic = str(ws["A1"].value or "")
 
-# 3) Find the header columns (row 2) — convert everything to str first
+# 3) Find the header columns (row 2) — always convert to string first
 headers = {
     str(ws.cell(row=2, column=c).value or "").strip(): c
     for c in range(1, ws.max_column + 1)
 }
 
-if ID_HEADER not in headers or NAME_HEADER not in headers:
-    raise KeyError(
-        f"Could not find required headers '{ID_HEADER}' and/or '{NAME_HEADER}' in row 2. "
-        f"Found: {list(headers.keys())}"
-    )
+# Ensure required headers are present
+for h in (ID_HEADER, NAME_HEADER, TYPE_HEADER, THRESH_HEADER):
+    if h not in headers:
+        raise KeyError(f"Missing required header '{h}' in row 2. Found: {list(headers.keys())}")
 
 id_col = headers[ID_HEADER]
 name_col = headers[NAME_HEADER]
+type_col = headers[TYPE_HEADER]
+thresh_col = headers[THRESH_HEADER]
 
-# 4) Build mapping dict from rows 3..N
+# 4) Build mapping dict and collect table rows
 mapping = {}
+table_rows = []
 for r in range(3, ws.max_row + 1):
     id_val = ws.cell(row=r, column=id_col).value
     name_val = ws.cell(row=r, column=name_col).value
+    type_val = ws.cell(row=r, column=type_col).value
+    thresh_val = ws.cell(row=r, column=thresh_col).value
     if id_val is None or name_val is None:
         continue
     key = normalize_id(id_val)
     if key:
         mapping[key] = str(name_val).strip()
+    table_rows.append([
+        str(id_val or ""),
+        str(name_val or ""),
+        str(type_val or ""),
+        str(thresh_val or "")
+    ])
 
 # 5) Replace whole-number tokens in the boolean expression
 pattern = re.compile(r"\b\d+\b")
+expanded_logic = pattern.sub(lambda m: mapping.get(m.group(0), m.group(0)), original_logic)
 
-def replacer(m):
-    tok = m.group(0)
-    return mapping.get(tok, tok)
+# 6) Build Markdown output
+md_lines = []
+md_lines.append("# DLP Classifier Logic Expansion\n")
+md_lines.append("## Input Classifiers\n")
+md_lines.append("| Condition Number | Content Classifier Name | Type | Threshold |")
+md_lines.append("| --- | --- | --- | --- |")
+for row in table_rows:
+    md_lines.append("| " + " | ".join(escape_md_cell(v) for v in row) + " |")
 
-expanded_logic = pattern.sub(replacer, original_logic)
+md_lines.append("\n## Original Boolean Logic\n")
+md_lines.append("```")
+md_lines.append(original_logic)
+md_lines.append("```")
 
-print("Original:", original_logic)
-print("Expanded:", expanded_logic)
+md_lines.append("\n## Expanded Boolean Logic\n")
+md_lines.append("```")
+md_lines.append(expanded_logic)
+md_lines.append("```")
 
-# 6) Write the result back to the sheet
-ws["B1"] = "Expanded Logic"
-ws["B2"] = expanded_logic
-wb.save(EXCEL_PATH)
+# 7) Write to .md file
+Path(OUTPUT_MD).write_text("\n".join(md_lines), encoding="utf-8")
+print(f"Wrote {OUTPUT_MD}")
