@@ -50,7 +50,7 @@ type_col = headers[TYPE_HEADER]
 thresh_col = headers[THRESH_HEADER]
 
 # 4) Build mapping dict and collect table rows
-mapping = {}  # maps "1" -> "ClassifierName"
+mapping = {}
 table_rows = []
 for r in range(3, ws.max_row + 1):
     id_val = ws.cell(row=r, column=id_col).value
@@ -73,12 +73,17 @@ for r in range(3, ws.max_row + 1):
 pattern = re.compile(r"\b\d+\b")
 expanded_logic = pattern.sub(lambda m: mapping.get(m.group(0), m.group(0)), original_logic)
 
-# 6) Format so AND, OR, (, ) are on their own lines
-expanded_logic_formatted = expanded_logic
-expanded_logic_formatted = re.sub(r"\b(AND|OR)\b", r"\n\1\n", expanded_logic_formatted, flags=re.IGNORECASE)
-expanded_logic_formatted = re.sub(r"\(", r"\n(\n", expanded_logic_formatted)
-expanded_logic_formatted = re.sub(r"\)", r"\n)\n", expanded_logic_formatted)
-expanded_logic_formatted = re.sub(r"\n\s*\n", r"\n", expanded_logic_formatted).strip()
+# 6) Formatting rules:
+#    - Split on OR (case-insensitive) so each OR block is a new line
+#    - Keep AND parts within each block together on one line
+parts = re.split(r"\bOR\b", expanded_logic, flags=re.IGNORECASE)
+formatted_lines = []
+for part in parts:
+    cleaned = re.sub(r"\s+", " ", part.strip())  # normalize spaces
+    if cleaned:
+        formatted_lines.append(cleaned)
+
+expanded_logic_formatted = "\nOR\n".join(formatted_lines)
 
 # 7) Build Markdown output
 md_lines = []
@@ -94,7 +99,7 @@ md_lines.append("```")
 md_lines.append(original_logic)
 md_lines.append("```")
 
-md_lines.append("\n## Expanded Boolean Logic (block formatted)\n")
+md_lines.append("\n## Expanded Boolean Logic (OR on new lines, AND groups kept together)\n")
 md_lines.append("```")
 md_lines.append(expanded_logic_formatted)
 md_lines.append("```")
