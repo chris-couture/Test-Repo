@@ -33,7 +33,7 @@ ws = wb[SHEET_NAME]
 # 2) Read original boolean logic from A1
 original_logic = str(ws["A1"].value or "")
 
-# 3) Find the header columns (row 2) — always convert to string first
+# 3) Find the header columns (row 2)
 headers = {
     str(ws.cell(row=2, column=c).value or "").strip(): c
     for c in range(1, ws.max_column + 1)
@@ -50,7 +50,7 @@ type_col = headers[TYPE_HEADER]
 thresh_col = headers[THRESH_HEADER]
 
 # 4) Build mapping dict and collect table rows
-mapping = {}
+mapping = {}  # maps "1" -> "ClassifierName"
 table_rows = []
 for r in range(3, ws.max_row + 1):
     id_val = ws.cell(row=r, column=id_col).value
@@ -69,12 +69,16 @@ for r in range(3, ws.max_row + 1):
         str(thresh_val or "")
     ])
 
-# 5) Replace whole-number tokens in the boolean expression
+# 5) Replace whole-number tokens with classifier names
 pattern = re.compile(r"\b\d+\b")
 expanded_logic = pattern.sub(lambda m: mapping.get(m.group(0), m.group(0)), original_logic)
 
-# 6) Insert newlines after AND or OR (preserve spacing around them)
-expanded_logic_with_breaks = re.sub(r"\b(AND|OR)\b", r"\1\n", expanded_logic, flags=re.IGNORECASE)
+# 6) Format so AND, OR, (, ) are on their own lines
+expanded_logic_formatted = expanded_logic
+expanded_logic_formatted = re.sub(r"\b(AND|OR)\b", r"\n\1\n", expanded_logic_formatted, flags=re.IGNORECASE)
+expanded_logic_formatted = re.sub(r"\(", r"\n(\n", expanded_logic_formatted)
+expanded_logic_formatted = re.sub(r"\)", r"\n)\n", expanded_logic_formatted)
+expanded_logic_formatted = re.sub(r"\n\s*\n", r"\n", expanded_logic_formatted).strip()
 
 # 7) Build Markdown output
 md_lines = []
@@ -90,9 +94,9 @@ md_lines.append("```")
 md_lines.append(original_logic)
 md_lines.append("```")
 
-md_lines.append("\n## Expanded Boolean Logic\n")
+md_lines.append("\n## Expanded Boolean Logic (block formatted)\n")
 md_lines.append("```")
-md_lines.append(expanded_logic_with_breaks.strip())
+md_lines.append(expanded_logic_formatted)
 md_lines.append("```")
 
 # 8) Write to .md file
