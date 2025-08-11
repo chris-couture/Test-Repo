@@ -4,7 +4,7 @@ from openpyxl import load_workbook
 from pathlib import Path
 
 EXCEL_PATH = "test.xlsx"
-SHEET_NAME = "Sheet1"
+SHEET_NAME = "sheet1"
 OUTPUT_MD = "dlp_output.md"
 
 ID_HEADER = "Condition Number"
@@ -73,7 +73,10 @@ for r in range(3, ws.max_row + 1):
 pattern = re.compile(r"\b\d+\b")
 expanded_logic = pattern.sub(lambda m: mapping.get(m.group(0), m.group(0)), original_logic)
 
-# 6) Build Markdown output
+# 6) Insert newlines after AND or OR (preserve spacing around them)
+expanded_logic_with_breaks = re.sub(r"\b(AND|OR)\b", r"\1\n", expanded_logic, flags=re.IGNORECASE)
+
+# 7) Build Markdown output
 md_lines = []
 md_lines.append("# DLP Classifier Logic Expansion\n")
 md_lines.append("## Input Classifiers\n")
@@ -89,9 +92,9 @@ md_lines.append("```")
 
 md_lines.append("\n## Expanded Boolean Logic\n")
 md_lines.append("```")
-md_lines.append(expanded_logic)
+md_lines.append(expanded_logic_with_breaks.strip())
 md_lines.append("```")
 
-# 7) Write to .md file
+# 8) Write to .md file
 Path(OUTPUT_MD).write_text("\n".join(md_lines), encoding="utf-8")
 print(f"Wrote {OUTPUT_MD}")
