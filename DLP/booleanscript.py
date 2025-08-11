@@ -25,12 +25,17 @@ ws = wb[SHEET_NAME]
 # 2) Read original boolean logic from A1
 original_logic = str(ws["A1"].value or "")
 
-# 3) Find the header columns (row 2)
-headers = { (ws.cell(row=2, column=c).value or "").strip(): c for c in range(1, ws.max_column + 1) }
+# 3) Find the header columns (row 2) — convert everything to str first
+headers = {
+    str(ws.cell(row=2, column=c).value or "").strip(): c
+    for c in range(1, ws.max_column + 1)
+}
 
 if ID_HEADER not in headers or NAME_HEADER not in headers:
-    raise KeyError(f"Could not find required headers '{ID_HEADER}' and/or '{NAME_HEADER}' in row 2. "
-                   f"Found: {list(headers.keys())}")
+    raise KeyError(
+        f"Could not find required headers '{ID_HEADER}' and/or '{NAME_HEADER}' in row 2. "
+        f"Found: {list(headers.keys())}"
+    )
 
 id_col = headers[ID_HEADER]
 name_col = headers[NAME_HEADER]
