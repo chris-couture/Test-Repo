@@ -72,14 +72,13 @@ expanded_logic = re.sub(r"\b\d+\b", lambda m: mapping.get(m.group(0), m.group(0)
 #    - if an AND block has > 2 items, wrap the whole line in parentheses
 or_blocks = re.split(r"\bOR\b", expanded_logic, flags=re.IGNORECASE)
 
-formatted_lines = []
+formatted_blocks = []
 for block in or_blocks:
     block = re.sub(r"\s+", " ", block.strip())  # normalize spaces
-
     if not block:
         continue
 
-    # Split this block by AND (case-insensitive) and normalize spacing
+    # Split this block by AND (case-insensitive)
     and_terms = [re.sub(r"\s+", " ", t.strip()) for t in re.split(r"\bAND\b", block, flags=re.IGNORECASE)]
     and_terms = [t for t in and_terms if t]
 
@@ -87,13 +86,21 @@ for block in or_blocks:
         line = and_terms[0]
     else:
         line = " AND ".join(and_terms)
-        # Parenthesize if the group has more than 2 items
         if len(and_terms) > 2 and not already_wrapped(line):
             line = f"({line})"
 
-    formatted_lines.append(line)
+    formatted_blocks.append(line)
 
-expanded_logic_formatted = "\nOR\n".join(formatted_lines)
+# Build final Expanded Boolean text:
+# - Each OR is on its own indented line ("  OR")
+# - Every line (including OR lines) ends with two spaces for Markdown line breaks
+output_lines = []
+for i, line in enumerate(formatted_blocks):
+    if i > 0:
+        output_lines.append("  OR  ")   # leading indent + trailing double space
+    output_lines.append(f"{line}  ")    # trailing double space for line break
+
+expanded_logic_formatted = "\n".join(output_lines).rstrip()
 
 # 7) Build Markdown output
 md_lines = []
@@ -109,10 +116,9 @@ md_lines.append("```")
 md_lines.append(original_logic)
 md_lines.append("```")
 
-md_lines.append("\n## Expanded Boolean Logic (OR on new lines; AND groups together; long AND groups parenthesized)\n")
-md_lines.append("```")
+md_lines.append("\n## Expanded Boolean Logic (OR on its own indented line)\n")
+# No code block here; write lines directly
 md_lines.append(expanded_logic_formatted)
-md_lines.append("```")
 
 # 8) Write to .md file
 Path(OUTPUT_MD).write_text("\n".join(md_lines), encoding="utf-8")
